@@ -1,0 +1,4 @@
+first: &first
+  name: foo
+second:
+  copy: *first

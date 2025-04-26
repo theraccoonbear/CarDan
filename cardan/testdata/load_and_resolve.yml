@@ -1,0 +1,6 @@
+jobA: &jobA
+  name: "A"
+
+jobB:
+  name: "B"
+  depends_on: [*jobA]

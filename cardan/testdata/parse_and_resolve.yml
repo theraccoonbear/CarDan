@@ -1,0 +1,7 @@
+defaults: &default
+  retries: 3
+  delay: 5
+
+job1:
+  <<: *default
+  name: job1
