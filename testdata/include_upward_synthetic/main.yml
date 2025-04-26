@@ -1,0 +1,2 @@
+tasks:
+  - !include subfolder/../subfolder/thing.yml
