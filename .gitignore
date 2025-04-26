@@ -1,0 +1,30 @@
+# Binaries
+*.exe
+*.dll
+*.so
+*.dylib
+*.test
+
+# Build artifacts
+/build/
+bin/
+out/
+
+# Go build cache
+*.log
+
+# Dependency vendoring (you are NOT committing vendor/)
+vendor/
+
+# Go modules artifact (rare edge case)
+go.sum.tmp
+
+# Editor/IDE junk
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS junk
+.DS_Store
+Thumbs.db
