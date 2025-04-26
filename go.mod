@@ -1,4 +1,4 @@
-module github.com/theraccoonbear/cardan
+module github.com/theraccoonbear/CarDan
 
 go 1.20
 
