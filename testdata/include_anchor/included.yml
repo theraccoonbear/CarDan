@@ -1,0 +1,2 @@
+settings: &inc_anchor
+  retries: 2
