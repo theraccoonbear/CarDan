@@ -97,6 +97,11 @@ func LoadWithOptions(r io.Reader, opts LoadOptions) (*Doc, error) {
 		if err := resolveIncludes(doc.RawTree, opts.BasePath, opts.IncludeTag, visited); err != nil {
 			return nil, err
 		}
+		// re-index anchors after processing includes
+		doc.NodesByID = make(map[string]*Node)
+		if err := indexNodes(doc, doc.RawTree.Content); err != nil {
+			return nil, err
+		}
 	}
 
 	return doc, nil
