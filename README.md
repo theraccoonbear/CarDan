@@ -58,7 +58,7 @@ import (
 	"log"
 	"strings"
 
-	"github.com/theraccoonbear/cardan"
+	"github.com/theraccoonbear/CarDan"
 )
 
 type Job struct {
