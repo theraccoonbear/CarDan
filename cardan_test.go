@@ -124,6 +124,29 @@ func TestLoadWithIncludes_RecursiveIncludes(t *testing.T) {
 	}
 }
 
+func TestLoadWithIncludes_RepeatIncludeOK(t *testing.T) {
+	base := "testdata/include_repeat"
+	mainPath := filepath.Join(base, "main.yml")
+	r, err := os.Open(mainPath)
+	if err != nil {
+		t.Fatalf("failed to open main.yml: %v", err)
+	}
+	defer r.Close()
+
+	doc, err := LoadWithOptions(r, LoadOptions{
+		IncludeTag: "!include",
+		BasePath:   base,
+	})
+	if err != nil {
+		t.Fatalf("unexpected error loading repeated includes: %v", err)
+	}
+
+	tasks := findMapEntry(doc.RawTree, "tasks")
+	if tasks == nil || tasks.Kind != yaml.SequenceNode || len(tasks.Content) != 2 {
+		t.Fatalf("expected two tasks from repeated includes")
+	}
+}
+
 func TestLoadWithIncludes_DenySyntacticTraversal(t *testing.T) {
 	base := "testdata/include_upward_synthetic"
 	mainPath := filepath.Join(base, "main.yml")

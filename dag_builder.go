@@ -6,11 +6,11 @@ import (
 )
 
 type DAGNode struct {
-	ID         string
-	DependsOn  []*DAGNode
-	AST        *yaml.Node
-	Visited    bool
-	Visiting   bool
+	ID        string
+	DependsOn []*DAGNode
+	AST       *yaml.Node
+	Visited   bool
+	Visiting  bool
 }
 
 type DAG struct {
