@@ -1,0 +1,3 @@
+tasks:
+  - !include task.yml
+  - !include task.yml

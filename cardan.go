@@ -93,8 +93,8 @@ func LoadWithOptions(r io.Reader, opts LoadOptions) (*Doc, error) {
 		if opts.BasePath == "" {
 			return nil, fmt.Errorf("BasePath must be set when IncludeTag is used")
 		}
-		visited := make(map[string]bool)
-		if err := resolveIncludes(doc.RawTree, opts.BasePath, opts.IncludeTag, visited); err != nil {
+		stack := make(map[string]int)
+		if err := resolveIncludes(doc.RawTree, opts.BasePath, opts.IncludeTag, stack); err != nil {
 			return nil, err
 		}
 		// re-index anchors after processing includes
@@ -107,7 +107,7 @@ func LoadWithOptions(r io.Reader, opts LoadOptions) (*Doc, error) {
 	return doc, nil
 }
 
-func resolveIncludes(node *yaml.Node, currentDir string, includeTag string, visited map[string]bool) error {
+func resolveIncludes(node *yaml.Node, currentDir string, includeTag string, stack map[string]int) error {
 	if node.Tag == includeTag {
 		includePath := filepath.Join(currentDir, node.Value)
 		cleanPath := filepath.Clean(includePath)
@@ -134,10 +134,11 @@ func resolveIncludes(node *yaml.Node, currentDir string, includeTag string, visi
 			return fmt.Errorf("included file escapes base directory: %s", node.Value)
 		}
 
-		if visited[cleanPath] {
+		if stack[cleanPath] > 0 {
 			return fmt.Errorf("recursive inclusion detected: %s", cleanPath)
 		}
-		visited[cleanPath] = true
+		stack[cleanPath]++
+		defer func() { stack[cleanPath]-- }()
 
 		content, err := os.ReadFile(cleanPath)
 		if err != nil {
@@ -150,7 +151,7 @@ func resolveIncludes(node *yaml.Node, currentDir string, includeTag string, visi
 		}
 
 		// Recursively process includes inside included content
-		if err := resolveIncludes(&includedNode, filepath.Dir(cleanPath), includeTag, visited); err != nil {
+		if err := resolveIncludes(&includedNode, filepath.Dir(cleanPath), includeTag, stack); err != nil {
 			return err
 		}
 
@@ -159,7 +160,7 @@ func resolveIncludes(node *yaml.Node, currentDir string, includeTag string, visi
 	}
 
 	for _, child := range node.Content {
-		if err := resolveIncludes(child, currentDir, includeTag, visited); err != nil {
+		if err := resolveIncludes(child, currentDir, includeTag, stack); err != nil {
 			return err
 		}
 	}
