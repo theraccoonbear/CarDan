@@ -1,0 +1,4 @@
+includedJob: &dup
+  name: included
+extraJob: &extra
+  name: extra

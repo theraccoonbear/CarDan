@@ -55,12 +55,14 @@ func indexNodes(doc *Doc, nodes []*yaml.Node) error {
 	for _, n := range nodes {
 		if n.Anchor != "" {
 			id := n.Anchor
-			doc.NodesByID[id] = &Node{
-				RefID:    id,
-				AST:      n,
-				AnchorID: n.Anchor,
-				Line:     n.Line,
-				Column:   n.Column,
+			if _, exists := doc.NodesByID[id]; !exists {
+				doc.NodesByID[id] = &Node{
+					RefID:    id,
+					AST:      n,
+					AnchorID: n.Anchor,
+					Line:     n.Line,
+					Column:   n.Column,
+				}
 			}
 		}
 		if n.Kind == yaml.SequenceNode || n.Kind == yaml.MappingNode {
@@ -96,6 +98,9 @@ func LoadWithOptions(r io.Reader, opts LoadOptions) (*Doc, error) {
 		visited := make(map[string]bool)
 		if err := resolveIncludes(doc.RawTree, opts.BasePath, opts.IncludeTag, visited); err != nil {
 			return nil, err
+		}
+		if err := indexNodes(doc, doc.RawTree.Content); err != nil {
+			return nil, fmt.Errorf("failed to re-index anchors: %w", err)
 		}
 	}
 

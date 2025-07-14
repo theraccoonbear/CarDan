@@ -1,0 +1,3 @@
+mainJob: &dup
+  name: main
+include: !include included.yml
