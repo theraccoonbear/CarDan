@@ -142,6 +142,37 @@ func TestLoadWithIncludes_DenySyntacticTraversal(t *testing.T) {
 	}
 }
 
+func TestLoadWithIncludes_IndexAnchors(t *testing.T) {
+	base := "testdata/include_anchor"
+	mainPath := filepath.Join(base, "main.yml")
+	r, err := os.Open(mainPath)
+	if err != nil {
+		t.Fatalf("failed to open main.yml: %v", err)
+	}
+	defer r.Close()
+
+	doc, err := LoadWithOptions(r, LoadOptions{
+		IncludeTag: "!include",
+		BasePath:   base,
+	})
+	if err != nil {
+		t.Fatalf("unexpected error loading with includes: %v", err)
+	}
+
+	if _, ok := doc.NodesByID["extra"]; !ok {
+		t.Fatal("expected anchor 'extra' from included file")
+	}
+
+	dup, ok := doc.NodesByID["dup"]
+	if !ok {
+		t.Fatalf("expected anchor 'dup' from main file not found")
+	}
+	name := findMapEntry(dup.AST, "name")
+	if name == nil || name.Value != "main" {
+		t.Fatalf("anchor 'dup' should reference main file value 'main', got %v", name)
+	}
+}
+
 // === HELPERS ===
 
 func parseTestDoc(t *testing.T, filename string) *Doc {
